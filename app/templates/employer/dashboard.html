@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Employer Dashboard - JobBoard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4"><i class="fas fa-building me-2"></i>Employer Dashboard</h2>
+    <p class="text-muted">Welcome, <strong>{{ current_user.name }}</strong>!</p>
+
+    <!-- Status Bar -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card p-3">
+                <small class="text-muted">Account Status</small>
+                {% if current_user.is_approved %}
+                    <h5 class="text-success fw-bold mb-0"><i class="fas fa-check-circle me-2"></i>Active</h5>
+                {% else %}
+                    <h5 class="text-warning fw-bold mb-0"><i class="fas fa-clock me-2"></i>Pending Activation</h5>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card p-3">
+                <small class="text-muted">Payment Status</small>
+                {% if payment %}
+                    <h5 class="fw-bold mb-0">
+                        {% if payment.status == 'confirmed' %}<span class="text-success"><i class="fas fa-check-circle me-2"></i>Confirmed</span>
+                        {% elif payment.status == 'rejected' %}<span class="text-danger"><i class="fas fa-times-circle me-2"></i>Rejected</span>
+                        {% else %}<span class="text-warning"><i class="fas fa-clock me-2"></i>Pending</span>{% endif %}
+                    </h5>
+                {% else %}
+                    <h5 class="text-danger fw-bold mb-0"><i class="fas fa-exclamation-circle me-2"></i>Not Uploaded</h5>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card p-3">
+                <small class="text-muted">Job Request</small>
+                {% if job_request %}
+                    <h5 class="text-success fw-bold mb-0"><i class="fas fa-check-circle me-2"></i>Submitted</h5>
+                {% else %}
+                    <h5 class="text-muted fw-bold mb-0"><i class="fas fa-minus-circle me-2"></i>Not Submitted</h5>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Step 1: Payment -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h5 class="mb-0"><i class="fas fa-money-bill me-2"></i>Step 1: Pay the Fee</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Payment Details:</strong>
+                        <pre class="mb-0 mt-2" style="font-size:0.85rem;">{{ payment_details }}</pre>
+                    </div>
+
+                    {% if not payment or payment.status == 'rejected' %}
+                    <form method="POST" action="{{ url_for('employer.upload_proof') }}" enctype="multipart/form-data">
+                        <label class="form-label fw-bold">Upload Payment Proof</label>
+                        <input type="file" name="proof" class="form-control mb-3" accept="image/*,.pdf" required>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-upload me-2"></i>Upload Proof</button>
+                    </form>
+                    {% elif payment.status == 'pending' %}
+                    <div class="alert alert-warning"><i class="fas fa-clock me-2"></i>Payment proof submitted. Awaiting admin confirmation.</div>
+                    {% else %}
+                    <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>Payment confirmed! You can now submit your job request.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Job Request -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Step 2: Submit Job Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if not current_user.is_approved %}
+                    <div class="alert alert-warning">Your account must be activated by the admin before submitting job details.</div>
+                    {% elif job_request %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>Job request submitted!<br>
+                        <strong>Title:</strong> {{ job_request.job_title }}<br>
+                        <strong>Company:</strong> {{ job_request.company_name }}<br>
+                        The admin will create your listing shortly.
+                    </div>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('employer.submit_job') }}">
+                        <div class="mb-2">
+                            <input type="text" name="company_name" class="form-control" placeholder="Company Name" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="job_title" class="form-control" placeholder="Job Title" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="location" class="form-control" placeholder="Location" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" name="salary_range" class="form-control" placeholder="Salary Range (e.g. $500-$800/month)">
+                        </div>
+                        <div class="mb-2">
+                            <textarea name="job_description" class="form-control" rows="3" placeholder="Job Description" required></textarea>
+                        </div>
+                        <div class="mb-2">
+                            <textarea name="requirements" class="form-control" rows="2" placeholder="Requirements (e.g. 2 years experience, degree)"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <textarea name="additional_notes" class="form-control" rows="2" placeholder="Any additional notes for the admin"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-paper-plane me-2"></i>Submit Job Request</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

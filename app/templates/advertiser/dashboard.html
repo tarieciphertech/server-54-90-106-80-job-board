@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Advertiser Dashboard - JobConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-1" style="font-family:'Syne',sans-serif;">Advertiser Dashboard</h2>
+    <p style="color:var(--muted);">Welcome, <strong style="color:var(--text);">{{ current_user.name }}</strong></p>
+
+    <!-- Status Bar -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card p-3">
+                <small class="text-muted">Account Status</small>
+                {% if current_user.is_approved %}
+                    <h5 class="text-success fw-bold mb-0 mt-1"><i class="fas fa-check-circle me-2"></i>Active</h5>
+                {% else %}
+                    <h5 class="fw-bold mb-0 mt-1" style="color:var(--warning);"><i class="fas fa-clock me-2"></i>Pending Activation</h5>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card p-3">
+                <small class="text-muted">Payment Status</small>
+                {% if payment %}
+                    <h5 class="fw-bold mb-0 mt-1">
+                        {% if payment.status == 'confirmed' %}<span class="text-success"><i class="fas fa-check-circle me-2"></i>Confirmed</span>
+                        {% elif payment.status == 'rejected' %}<span class="text-danger"><i class="fas fa-times-circle me-2"></i>Rejected</span>
+                        {% else %}<span style="color:var(--warning);"><i class="fas fa-clock me-2"></i>Pending</span>{% endif %}
+                    </h5>
+                {% else %}
+                    <h5 class="fw-bold mb-0 mt-1 text-danger"><i class="fas fa-exclamation-circle me-2"></i>Not Uploaded</h5>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card p-3">
+                <small class="text-muted">Advert Status</small>
+                {% if advert %}
+                    {% if advert.is_published and not advert.is_expired %}
+                        <h5 class="text-success fw-bold mb-0 mt-1"><i class="fas fa-globe me-2"></i>Live — {{ advert.days_remaining }} days left</h5>
+                    {% elif advert.is_expired %}
+                        <h5 class="text-danger fw-bold mb-0 mt-1"><i class="fas fa-times-circle me-2"></i>Expired</h5>
+                    {% else %}
+                        <h5 class="fw-bold mb-0 mt-1" style="color:var(--warning);"><i class="fas fa-clock me-2"></i>Under Review</h5>
+                    {% endif %}
+                {% else %}
+                    <h5 class="fw-bold mb-0 mt-1" style="color:var(--muted);"><i class="fas fa-minus-circle me-2"></i>Not Submitted</h5>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Step 1: Choose Package & Pay -->
+        <div class="col-md-5">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Step 1: Choose Package & Pay</h5>
+                </div>
+                <div class="card-body">
+
+                    <!-- Packages -->
+                    <div class="mb-4">
+                        {% for key, pkg in packages.items() %}
+                        <div class="card mb-2 p-3" style="border: 2px solid {% if payment and payment.package == key and payment.status == 'confirmed' %}rgba(34,197,94,0.4){% else %}var(--border){% endif %};">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-0" style="font-family:'Syne',sans-serif;">{{ pkg.label }}</h6>
+                                    <small style="color:var(--muted);">{{ pkg.days }} days of advertising</small>
+                                </div>
+                                <div class="text-end">
+                                    <span style="font-size:1.3rem;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;">${{ pkg.price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div class="alert alert-info mb-3">
+                        <strong><i class="fas fa-info-circle me-2"></i>Payment Details:</strong>
+                        <pre class="mb-0 mt-2" style="font-size:0.82rem;white-space:pre-wrap;">{{ payment_details }}</pre>
+                    </div>
+
+                    <!-- Upload Proof -->
+                    {% if not payment or payment.status == 'rejected' %}
+                    <form method="POST" action="{{ url_for('advertiser.upload_proof') }}" enctype="multipart/form-data">
+                        <div class="mb-2">
+                            <label class="form-label">Select Package</label>
+                            <select name="package" class="form-control" required>
+                                <option value="">-- Choose a package --</option>
+                                {% for key, pkg in packages.items() %}
+                                <option value="{{ key }}">{{ pkg.label }} — ${{ pkg.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload Payment Proof</label>
+                            <input type="file" name="proof" class="form-control" accept="image/*,.pdf" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-upload me-2"></i>Upload Proof</button>
+                    </form>
+                    {% elif payment.status == 'pending' %}
+                    <div class="alert alert-warning mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        Payment proof submitted for <strong>{{ packages[payment.package].label }}</strong> package (${{ packages[payment.package].price }}).
+                        Awaiting admin confirmation.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Payment confirmed! <strong>{{ packages[payment.package].label }}</strong> package active.
+                        You can now submit your advert.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Submit Advert -->
+        <div class="col-md-7">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h5 class="mb-0"><i class="fas fa-ad me-2"></i>Step 2: Submit Your Advert</h5>
+                </div>
+                <div class="card-body">
+                    {% if not current_user.is_approved %}
+                    <div class="alert alert-warning">Your account must be activated by admin before submitting your advert.</div>
+                    {% elif advert and advert.is_published and not advert.is_expired %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-globe me-2"></i>Your advert is <strong>LIVE</strong>!<br>
+                        <strong>Business:</strong> {{ advert.business_name }}<br>
+                        <strong>Package:</strong> {{ advert.package_label }}<br>
+                        <strong>Expires:</strong> {{ advert.expires_at.strftime('%d %b %Y') }}<br>
+                        <strong>Days Remaining:</strong> {{ advert.days_remaining }} days
+                    </div>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('advertiser.submit_advert') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Business / Product Name</label>
+                            <input type="text" name="business_name" class="form-control" placeholder="e.g. Sunshine Bakery" value="{{ advert.business_name if advert else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">What are you advertising?</label>
+                            <textarea name="description" class="form-control" rows="4" placeholder="Describe your product or service..." required>{{ advert.description if advert else '' }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contact Information</label>
+                            <input type="text" name="contact_info" class="form-control" placeholder="Phone, email or address" value="{{ advert.contact_info if advert else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Website / Social Media Link <span style="color:var(--muted);">(optional)</span></label>
+                            <input type="url" name="website_url" class="form-control" placeholder="https://yourwebsite.com" value="{{ advert.website_url if advert else '' }}">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Advert Image / Banner <span style="color:var(--muted);">(optional)</span></label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
+                            <small style="color:var(--muted);">Recommended size: 800x400px</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-paper-plane me-2"></i>{{ 'Update Advert' if advert else 'Submit Advert' }}
+                        </button>
+                    </form>
+                    {% if advert and not advert.is_published %}
+                    <div class="alert alert-warning mt-3"><i class="fas fa-clock me-2"></i>Advert submitted and under review. Admin will publish it shortly.</div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

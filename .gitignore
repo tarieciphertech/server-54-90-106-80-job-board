@@ -1,0 +1,36 @@
+# Runtime and secrets
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+*.crt
+*secret*
+
+# Python/runtime
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+instance/
+uploads/
+app/static/uploads/
+*.log
+*.pid
+*.bak*
+*.service
+
+# Node/builds
+node_modules/
+dist/
+build/
+
+# Editors/OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

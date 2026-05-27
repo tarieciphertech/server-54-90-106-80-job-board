@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Advertisements - JobConnect{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:0.5rem;font-family:'Syne',sans-serif;">Marketplace</div>
+        <h2 style="font-size:2rem;font-weight:800;letter-spacing:-0.5px;">Advertisements</h2>
+        <p style="color:var(--muted);">Products and services from our advertisers</p>
+    </div>
+    <div class="row g-4">
+        {% for advert in adverts %}
+        <div class="col-md-4">
+            <div class="card candidate-card h-100">
+                {% if advert.image_file %}
+                <img src="{{ url_for('public.uploaded_file', filename=advert.image_file) }}"
+                     style="height:200px;object-fit:cover;border-radius:16px 16px 0 0;width:100%;">
+                {% else %}
+                <div style="height:120px;background:linear-gradient(135deg,var(--bg3),var(--bg2));border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-bullhorn" style="font-size:2.5rem;color:var(--accent);opacity:0.4;"></i>
+                </div>
+                {% endif %}
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 style="font-weight:700;font-family:'Syne',sans-serif;margin-bottom:0;">{{ advert.business_name }}</h5>
+                        <span class="badge bg-success">{{ advert.days_remaining }}d left</span>
+                    </div>
+                    <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">{{ advert.description }}</p>
+                    <div class="d-flex flex-column gap-1">
+                        <div style="font-size:0.85rem;">
+                            <i class="fas fa-phone me-2" style="color:var(--accent);"></i>{{ advert.contact_info }}
+                        </div>
+                        {% if advert.website_url %}
+                        <div style="font-size:0.85rem;">
+                            <i class="fas fa-globe me-2" style="color:var(--accent);"></i>
+                            <a href="{{ advert.website_url }}" target="_blank" style="color:var(--accent);">Visit Website</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5" style="color:var(--muted);">
+            <i class="fas fa-bullhorn fa-3x mb-3 d-block" style="opacity:0.2;"></i>
+            No advertisements yet. <a href="{{ url_for('auth.register') }}" style="color:var(--accent);">Advertise your business here!</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- CTA -->
+    {% if adverts %}
+    <div class="text-center mt-5 pt-4" style="border-top:1px solid var(--border);">
+        <h5 style="font-weight:700;font-family:'Syne',sans-serif;">Want to advertise here?</h5>
+        <p style="color:var(--muted);">Reach thousands of job seekers and employers from $50</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary px-4">Get Started</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

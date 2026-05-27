@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}{{ candidate.full_name }} - JobBoard{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card p-4 mb-4">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center me-3" style="width:70px;height:70px;font-size:2rem;font-weight:bold;">
+                        {{ candidate.full_name[0].upper() }}
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-1">{{ candidate.full_name }}</h2>
+                        <span class="badge bg-success fs-6">Available for Hire</span>
+                    </div>
+                </div>
+                <hr>
+                <h5 class="fw-bold">Skills</h5>
+                <p style="white-space: pre-line;">{{ candidate.skills }}</p>
+                <h5 class="fw-bold mt-3">Experience</h5>
+                <p style="white-space: pre-line;">{{ candidate.experience }}</p>
+                <h5 class="fw-bold mt-3">Education</h5>
+                <p style="white-space: pre-line;">{{ candidate.education }}</p>
+                <small class="text-muted">Profile listed: {{ candidate.submitted_at.strftime('%d %B %Y') }}</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3"><i class="fas fa-hand-point-right me-2 text-danger"></i>Interested in this Candidate?</h5>
+                <p class="text-muted small">Fill in your details and the administrator will contact you shortly.</p>
+                <form method="POST" action="{{ url_for('public.inquire') }}">
+                    <input type="hidden" name="inquiry_type" value="candidate">
+                    <input type="hidden" name="reference_id" value="{{ candidate.id }}">
+                    <div class="mb-2">
+                        <input type="text" name="visitor_name" class="form-control" placeholder="Your Full Name" required>
+                    </div>
+                    <div class="mb-2">
+                        <input type="email" name="visitor_email" class="form-control" placeholder="Your Email" required>
+                    </div>
+                    <div class="mb-2">
+                        <input type="text" name="visitor_phone" class="form-control" placeholder="Your Phone Number" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="message" class="form-control" rows="3" placeholder="Brief message (optional)"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-paper-plane me-2"></i>I'm Interested</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <a href="{{ url_for('public.candidates') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to Candidates</a>
+</div>
+{% endblock %}

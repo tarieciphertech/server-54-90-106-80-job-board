@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Create Listing - Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0"><i class="fas fa-plus me-2"></i>Create Job Listing</h3>
+        <a href="{{ url_for('admin_bp.job_requests') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back</a>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Job Title</label>
+                        <input type="text" name="title" class="form-control" value="{{ job_request.job_title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Company Name</label>
+                        <input type="text" name="company_name" class="form-control" value="{{ job_request.company_name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Location</label>
+                        <input type="text" name="location" class="form-control" value="{{ job_request.location }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Salary Range</label>
+                        <input type="text" name="salary_range" class="form-control" value="{{ job_request.salary_range }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Job Description</label>
+                        <textarea name="description" class="form-control" rows="5" required>{{ job_request.job_description }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Requirements</label>
+                        <textarea name="requirements" class="form-control" rows="3">{{ job_request.requirements }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="fas fa-bullhorn me-2"></i>Publish Listing Now
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 bg-light">
+                <h6 class="fw-bold">Employer Notes</h6>
+                <p class="text-muted small">{{ job_request.additional_notes or 'No additional notes.' }}</p>
+                <hr>
+                <h6 class="fw-bold">Employer Contact</h6>
+                <p class="small mb-1">{{ job_request.employer.name }}</p>
+                <p class="small mb-1">{{ job_request.employer.email }}</p>
+                <p class="small mb-0">{{ job_request.employer.phone }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

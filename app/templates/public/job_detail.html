@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}{{ job.title }} - JobBoard{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card p-4 mb-4">
+                <h2 class="fw-bold">{{ job.title }}</h2>
+                <p class="text-muted mb-1"><i class="fas fa-building me-2"></i><strong>{{ job.company_name }}</strong></p>
+                <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ job.location }}</p>
+                <p class="text-muted mb-3"><i class="fas fa-dollar-sign me-2"></i>{{ job.salary_range }}</p>
+                <hr>
+                <h5 class="fw-bold">Job Description</h5>
+                <p style="white-space: pre-line;">{{ job.description }}</p>
+                {% if job.requirements %}
+                <h5 class="fw-bold mt-3">Requirements</h5>
+                <p style="white-space: pre-line;">{{ job.requirements }}</p>
+                {% endif %}
+                <small class="text-muted">Posted: {{ job.created_at.strftime('%d %B %Y') }}</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3"><i class="fas fa-hand-point-right me-2 text-danger"></i>Interested in this Job?</h5>
+                <p class="text-muted small">Fill in your details and the administrator will contact you shortly.</p>
+                <form method="POST" action="{{ url_for('public.inquire') }}">
+                    <input type="hidden" name="inquiry_type" value="job">
+                    <input type="hidden" name="reference_id" value="{{ job.id }}">
+                    <div class="mb-2">
+                        <input type="text" name="visitor_name" class="form-control" placeholder="Your Full Name" required>
+                    </div>
+                    <div class="mb-2">
+                        <input type="email" name="visitor_email" class="form-control" placeholder="Your Email" required>
+                    </div>
+                    <div class="mb-2">
+                        <input type="text" name="visitor_phone" class="form-control" placeholder="Your Phone Number" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="message" class="form-control" rows="3" placeholder="Brief message (optional)"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-paper-plane me-2"></i>I'm Interested</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <a href="{{ url_for('public.jobs') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to Jobs</a>
+</div>
+{% endblock %}

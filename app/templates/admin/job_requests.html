@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Job Requests - Admin{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0"><i class="fas fa-briefcase me-2"></i>Job Requests</h3>
+        <a href="{{ url_for('admin_bp.dashboard') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Dashboard</a>
+    </div>
+    <div class="row g-4">
+        {% for req in requests %}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold">{{ req.job_title }}</h5>
+                    <p class="text-muted mb-1"><i class="fas fa-building me-2"></i>{{ req.company_name }}</p>
+                    <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ req.location }}</p>
+                    <p class="text-muted mb-1"><i class="fas fa-dollar-sign me-2"></i>{{ req.salary_range }}</p>
+                    <p class="mb-2"><strong>Description:</strong> {{ req.job_description }}</p>
+                    {% if req.requirements %}
+                    <p class="mb-2"><strong>Requirements:</strong> {{ req.requirements }}</p>
+                    {% endif %}
+                    {% if req.additional_notes %}
+                    <p class="mb-2"><strong>Notes:</strong> {{ req.additional_notes }}</p>
+                    {% endif %}
+                    <small class="text-muted">Submitted: {{ req.submitted_at.strftime('%d %b %Y %H:%M') }}</small><br>
+                    <small class="text-muted">By: {{ req.employer.name }} ({{ req.employer.email }})</small>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin_bp.create_listing', request_id=req.id) }}" class="btn btn-primary w-100">
+                        <i class="fas fa-bullhorn me-2"></i>Create & Publish Listing
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-muted py-5">No job requests yet.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

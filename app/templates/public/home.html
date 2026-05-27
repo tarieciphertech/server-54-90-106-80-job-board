@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% block title %}JobConnect - Find Jobs & Talent{% endblock %}
+
+{% block content %}
+<style>
+    .hero-section {
+        min-height: 88vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        padding: 80px 0;
+    }
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -200px; right: -200px;
+        width: 600px; height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: -150px; left: -150px;
+        width: 400px; height: 400px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(245,166,35,0.1);
+        border: 1px solid rgba(245,166,35,0.25);
+        color: var(--accent);
+        padding: 6px 14px;
+        border-radius: 100px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+    }
+    .hero-title {
+        font-size: clamp(2.8rem, 6vw, 5rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -2px;
+        margin-bottom: 1.5rem;
+    }
+    .hero-title .line-accent { color: var(--accent); }
+    .hero-subtitle {
+        color: var(--muted);
+        font-size: 1.1rem;
+        line-height: 1.7;
+        max-width: 480px;
+        margin-bottom: 2.5rem;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-hero-primary {
+        background: var(--accent);
+        color: #000;
+        font-weight: 700;
+        font-family: 'Syne', sans-serif;
+        padding: 0.8rem 1.8rem;
+        border-radius: 10px;
+        border: none;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero-primary:hover { background: #ffb84d; color: #000; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,166,35,0.35); }
+    .btn-hero-secondary {
+        background: transparent;
+        color: var(--text);
+        font-weight: 600;
+        font-family: 'Syne', sans-serif;
+        padding: 0.8rem 1.8rem;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .btn-hero-secondary:hover { border-color: var(--muted); color: var(--text); background: var(--bg3); }
+
+    .hero-stats {
+        display: flex;
+        gap: 32px;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+    }
+    .hero-stat-num {
+        font-family: 'Syne', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+    }
+    .hero-stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+    .hero-visual {
+        position: relative;
+    }
+    .floating-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 16px;
+        transition: all 0.3s;
+        animation: floatCard 3s ease-in-out infinite;
+    }
+    .floating-card:nth-child(2) { animation-delay: 0.5s; margin-left: 32px; }
+    .floating-card:nth-child(3) { animation-delay: 1s; }
+    @keyframes floatCard {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+    .floating-card:hover { border-color: rgba(245,166,35,0.3); }
+
+    .section-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        margin-bottom: 0.5rem;
+        font-family: 'Syne', sans-serif;
+    }
+    .section-title {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 0;
+    }
+
+    .steps-grid { counter-reset: step; }
+    .step-card { position: relative; padding: 2rem; }
+    .step-number {
+        font-family: 'Syne', sans-serif;
+        font-size: 4rem;
+        font-weight: 800;
+        color: rgba(245,166,35,0.1);
+        line-height: 1;
+        position: absolute;
+        top: 1rem; right: 1.5rem;
+    }
+    .step-icon {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        background: rgba(245,166,35,0.1);
+        border: 1px solid rgba(245,166,35,0.2);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--accent);
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+    }
+    .step-card h5 { font-weight: 700; margin-bottom: 0.5rem; }
+    .step-card p { color: var(--muted); font-size: 0.9rem; margin: 0; }
+</style>
+
+<!-- Hero -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="hero-eyebrow">
+                    <span style="width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;"></span>
+                    Africa's Job Advertisement Platform
+                </div>
+                <h1 class="hero-title">
+                    Your Next<br>
+                    <span class="line-accent">Opportunity</span><br>
+                    Starts Here
+                </h1>
+                <p class="hero-subtitle">Browse advertised jobs and available talent. Our administrator personally handles every connection, ensuring quality results.</p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('public.jobs') }}" class="btn-hero-primary">
+                        Browse Jobs <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="btn-hero-secondary">Get Advertised</a>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-num">{{ latest_jobs|length }}+</div>
+                        <div class="hero-stat-label">Active Jobs</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">{{ latest_candidates|length }}+</div>
+                        <div class="hero-stat-label">Candidates</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">100%</div>
+                        <div class="hero-stat-label">Admin Managed</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block hero-visual">
+                {% if latest_jobs %}
+                    {% for job in latest_jobs[:3] %}
+                    <div class="floating-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-circle" style="border-radius:10px;font-size:0.9rem;">
+                                {{ job.company_name[0].upper() }}
+                            </div>
+                            <div>
+                                <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;">{{ job.title }}</div>
+                                <div style="color:var(--muted);font-size:0.8rem;">{{ job.company_name }} · {{ job.location }}</div>
+                            </div>
+                            <span class="ms-auto tag">{{ job.salary_range }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="floating-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-circle">S</div>
+                            <div>
+                                <div style="font-family:'Syne',sans-serif;font-weight:700;">Software Engineer</div>
+                                <div style="color:var(--muted);font-size:0.8rem;">TechCorp · Harare</div>
+                            </div>
+                            <span class="ms-auto tag">$800/mo</span>
+                        </div>
+                    </div>
+                    <div class="floating-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-circle" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">A</div>
+                            <div>
+                                <div style="font-family:'Syne',sans-serif;font-weight:700;">Accountant</div>
+                                <div style="color:var(--muted);font-size:0.8rem;">FinanceGroup · Bulawayo</div>
+                            </div>
+                            <span class="ms-auto tag">$600/mo</span>
+                        </div>
+                    </div>
+                    <div class="floating-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-circle" style="background:linear-gradient(135deg,#22c55e,#16a34a);">M</div>
+                            <div>
+                                <div style="font-family:'Syne',sans-serif;font-weight:700;">Marketing Manager</div>
+                                <div style="color:var(--muted);font-size:0.8rem;">BrandCo · Mutare</div>
+                            </div>
+                            <span class="ms-auto tag">$700/mo</span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);" class="py-5">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <div class="section-label">Process</div>
+            <h2 class="section-title">How It Works</h2>
+        </div>
+        <div class="row g-4 steps-grid">
+            <div class="col-md-4">
+                <div class="card step-card h-100">
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                    <h5>Register</h5>
+                    <p>Sign up as an employer or job seeker and fill in your details on the platform.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card step-card h-100">
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <h5>Pay the Fee</h5>
+                    <p>Pay the admin fee directly and upload your proof of payment for confirmation.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card step-card h-100">
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><i class="fas fa-bullhorn"></i></div>
+                    <h5>Get Advertised</h5>
+                    <p>Admin publishes your listing. Interested visitors contact us and we connect you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Jobs -->
+<section class="py-5">
+    <div class="container py-3">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <div class="section-label">Opportunities</div>
+                <h2 class="section-title">Latest Job Listings</h2>
+            </div>
+            <a href="{{ url_for('public.jobs') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        {% if latest_jobs %}
+        <div class="row g-4">
+            {% for job in latest_jobs %}
+            <div class="col-md-4">
+                <div class="card job-card h-100 p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="avatar-circle">{{ job.company_name[0].upper() }}</div>
+                        <div>
+                            <div style="font-size:0.8rem;color:var(--muted);">{{ job.company_name }}</div>
+                            <div class="tag">{{ job.location }}</div>
+                        </div>
+                    </div>
+                    <h5 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem;">{{ job.title }}</h5>
+                    <p style="color:var(--muted);font-size:0.85rem;flex-grow:1;">{{ job.description[:90] }}...</p>
+                    <div class="d-flex align-items-center justify-content-between mt-3">
+                        <span style="color:var(--accent);font-weight:700;font-size:0.9rem;font-family:'Syne',sans-serif;">{{ job.salary_range }}</span>
+                        <a href="{{ url_for('public.job_detail', job_id=job.id) }}" class="btn btn-primary btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5" style="color:var(--muted);">
+            <i class="fas fa-briefcase fa-2x mb-3 d-block" style="opacity:0.3;"></i>
+            No job listings yet. Check back soon!
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Latest Candidates -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);" class="py-5">
+    <div class="container py-3">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <div class="section-label">Talent</div>
+                <h2 class="section-title">Available Candidates</h2>
+            </div>
+            <a href="{{ url_for('public.candidates') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        {% if latest_candidates %}
+        <div class="row g-4">
+            {% for candidate in latest_candidates %}
+            <div class="col-md-4">
+                <div class="card candidate-card h-100 p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="avatar-circle avatar-circle-lg">{{ candidate.full_name[0].upper() }}</div>
+                        <div>
+                            <h6 style="font-weight:700;margin-bottom:4px;">{{ candidate.full_name }}</h6>
+                            <span class="badge bg-success">Available</span>
+                        </div>
+                    </div>
+                    <p style="color:var(--muted);font-size:0.85rem;flex-grow:1;">{{ candidate.skills[:100] }}...</p>
+                    <a href="{{ url_for('public.candidate_detail', profile_id=candidate.id) }}" class="btn btn-outline-primary btn-sm mt-3">View Profile</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5" style="color:var(--muted);">
+            <i class="fas fa-users fa-2x mb-3 d-block" style="opacity:0.3;"></i>
+            No candidates yet. Check back soon!
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Adverts Section -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);" class="py-5">
+    <div class="container py-3">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <div class="section-label">Marketplace</div>
+                <h2 class="section-title">Advertisements</h2>
+            </div>
+            <a href="{{ url_for('public.adverts') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        {% if active_adverts %}
+        <div class="row g-4">
+            {% for advert in active_adverts[:3] %}
+            <div class="col-md-4">
+                <div class="card candidate-card h-100">
+                    {% if advert.image_file %}
+                    <img src="{{ url_for('public.uploaded_file', filename=advert.image_file) }}" style="height:160px;object-fit:cover;border-radius:16px 16px 0 0;width:100%;">
+                    {% else %}
+                    <div style="height:100px;background:linear-gradient(135deg,var(--bg3),var(--bg2));border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-bullhorn" style="font-size:2rem;color:var(--accent);opacity:0.4;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="p-3">
+                        <h6 style="font-weight:700;font-family:'Syne',sans-serif;">{{ advert.business_name }}</h6>
+                        <p style="color:var(--muted);font-size:0.83rem;margin-bottom:0.8rem;">{{ advert.description[:100] }}...</p>
+                        <div style="font-size:0.82rem;"><i class="fas fa-phone me-2" style="color:var(--accent);"></i>{{ advert.contact_info }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4" style="color:var(--muted);">
+            <i class="fas fa-bullhorn fa-2x mb-2 d-block" style="opacity:0.2;"></i>
+            No advertisements yet. <a href="{{ url_for('auth.register') }}" style="color:var(--accent);">Be the first to advertise!</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CTA -->
+<section style="border-top:1px solid var(--border);" class="py-5">
+    <div class="container py-4 text-center">
+        <div class="section-label">Get Started</div>
+        <h2 style="font-size:2.5rem;font-weight:800;letter-spacing:-1px;margin-bottom:1rem;">Ready to Get Advertised?</h2>
+        <p style="color:var(--muted);max-width:500px;margin:0 auto 2rem;">Register today and let our administrator handle everything — from publishing your listing to connecting you with the right people.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">Register Now <i class="fas fa-arrow-right"></i></a>
+            <a href="{{ url_for('public.contact') }}" class="btn-hero-secondary">Contact Admin</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
